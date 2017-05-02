@@ -131,7 +131,14 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     Hj_ = tools.CalculateJacobian(ekf_.x_);
     ekf_.R_ = R_radar_;
     ekf_.H_ = Hj_;
-    ekf_.UpdateEKF(measurement_pack.raw_measurements_);	
+    ekf_.UpdateEKF(measurement_pack.raw_measurements_, zpred);
+    double phi = atan(ekf_.x_[1] / ekf_.x_[0]);
+    double rho = sqrt(pow(ekf_.x_[0], 2) + pow(ekf_.x_[1], 2));
+    double rho_d = ((ekf_.x_[0] * ekf_.x_[2] + ekf_.x_[1] * ekf_.x_[3]) / (sqrt(pow(ekf_.x_[0], 2) + pow(ekf_.x_[1], 2))));
+
+    MatrixXd zpred(3, 1);
+    zpred << rho, phi, rho_d;
+	
   } else {
     // Laser updates
     ekf_.R_ = R_laser_;
